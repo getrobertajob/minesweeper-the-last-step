@@ -4,20 +4,19 @@ import pygame
 import random
 import time
 
-# Initialize Pygame
+# initialize Pygame
 pygame.init()
 
-# Function to get the correct path to the resources
+# function to get resources path
 def resource_path(relative_path):
     """ Get the absolute path to a resource, works for dev and for PyInstaller """
     try:
-        # PyInstaller creates a temp folder and stores the path in _MEIPASS
         base_path = sys._MEIPASS
     except AttributeError:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-# Define some constants
+# define constants
 GRID_SIZE = 10
 CELL_SIZE = 40
 BUTTON_WIDTH = 120
@@ -39,7 +38,7 @@ SCOREBOARD_COLOR = (230, 230, 230)  # Light grey for the scoreboard background
 SCOREBOARD_TEXT_COLOR = (0, 0, 0)  # Black color for text
 CIRCLE_COLOR = (0, 255, 0, 100)  # Green with transparency (RGBA)
 
-# Update paths to resources using the resource_path function
+# to update resource path
 CHARACTER_IMAGE_PATH = resource_path('images/character.png')
 LANDMINE_IMAGE_PATH = resource_path('images/landmine.png')
 EXPLOSION_IMAGE_PATH = resource_path('images/explosion.png')
@@ -49,14 +48,14 @@ EXPLOSION_SOUND_PATH = resource_path('audio/explosion.mp3')
 WIN_SOUND_PATH = resource_path('audio/win.mp3')
 LOSE_SOUND_PATH = resource_path('audio/loose.mp3')
 
-# Set up the display
+# start display
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Minesweeper Grid")
 
-# Set the number of mines
-num_mines = 5  # You can change this value to control the number of mines
+# variable to storge adjust number of mines
+num_mines = 5
 
-# Load the character image, landmine image, and explosion image
+# to load images
 character_image = pygame.image.load(CHARACTER_IMAGE_PATH)
 character_image = pygame.transform.scale(character_image, (CELL_SIZE, CELL_SIZE))
 landmine_image = pygame.image.load(LANDMINE_IMAGE_PATH)
@@ -64,14 +63,14 @@ landmine_image = pygame.transform.scale(landmine_image, (CELL_SIZE, CELL_SIZE))
 explosion_image = pygame.image.load(EXPLOSION_IMAGE_PATH)
 explosion_image = pygame.transform.scale(explosion_image, (CELL_SIZE, CELL_SIZE))
 
-# Load the sound effects
+# to load sound effects
 footsteps_sound = pygame.mixer.Sound(FOOTSTEPS_SOUND_PATH)
 click_sound = pygame.mixer.Sound(CLICK_SOUND_PATH)
 explosion_sound = pygame.mixer.Sound(EXPLOSION_SOUND_PATH)
 win_sound = pygame.mixer.Sound(WIN_SOUND_PATH)
 lose_sound = pygame.mixer.Sound(LOSE_SOUND_PATH)
 
-# Function to reset the game
+# function to reset game
 def reset_game():
     global character_pos, mine_positions, score, time_remaining, start_ticks, timer_stopped, landmines, explosions
     character_pos = [random.randint(0, GRID_SIZE-1), random.randint(0, GRID_SIZE-1)]
@@ -87,20 +86,20 @@ def reset_game():
     start_ticks = pygame.time.get_ticks()
     timer_stopped = False
 
-# Initialize the game
+# initialize the game
 character_pos = [random.randint(0, GRID_SIZE-1), random.randint(0, GRID_SIZE-1)]
 mine_positions = set()
 landmines = []
 explosions = []
 reset_game()
 
-# Initialize the score variable and timer
+# initialize score and timer
 score = 0
 time_remaining = 60
 start_ticks = pygame.time.get_ticks()
 timer_stopped = False
 
-# Function to count mines around a given cell
+# function to count mines around a given cell
 def count_adjacent_mines(pos, mine_positions):
     x, y = pos
     count = 0
@@ -112,7 +111,7 @@ def count_adjacent_mines(pos, mine_positions):
                 count += 1
     return count
 
-# Function to get the positions of adjacent mines
+# function to get positions of adjacent mines
 def get_adjacent_mines(pos, mine_positions):
     x, y = pos
     adjacent_mines = []
@@ -125,18 +124,18 @@ def get_adjacent_mines(pos, mine_positions):
                 adjacent_mines.append(adjacent_pos)
     return adjacent_mines
 
-# Function to check if the character is adjacent to any mine
+# function to check if character is adjacent to any mines
 def is_adjacent_to_mine(character_pos, mine_positions):
     return count_adjacent_mines(character_pos, mine_positions) > 0
 
-# Function to display the "Game Over" or "Congratulations" popup
+# function to display the "Game Over" or "Congratulations" popup
 def show_popup(message, score, time_taken=None, win=False):
     popup_width = 300
     popup_height = 220
     popup_x = (WINDOW_WIDTH - popup_width) // 2
     popup_y = (WINDOW_HEIGHT - popup_height) // 2
 
-    # Play the win or lose sound
+    # play win or lose sound effect
     if win:
         win_sound.play()
     else:
@@ -158,7 +157,6 @@ def show_popup(message, score, time_taken=None, win=False):
         time_surface = font.render(f"Time bonus: {time_bonus}", True, SCOREBOARD_TEXT_COLOR)
         screen.blit(time_surface, (popup_x + (popup_width - time_surface.get_width()) // 2, popup_y + 80))
 
-        # Draw the black line separator
         pygame.draw.line(screen, SCOREBOARD_TEXT_COLOR, (popup_x + 20, popup_y + 110), (popup_x + popup_width - 20, popup_y + 110), 3)
 
         final_score = score + time_bonus
@@ -177,19 +175,19 @@ def show_popup(message, score, time_taken=None, win=False):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()  # Updated to sys.exit() instead of exit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if try_again_button_rect.collidepoint(pygame.mouse.get_pos()):
                     reset_game()
                     return
                 elif end_game_button_rect.collidepoint(pygame.mouse.get_pos()):
                     pygame.quit()
-                    sys.exit()  # Updated to sys.exit() instead of exit()
+                    sys.exit()
 
-# Set up the font for rendering text
+# set font for text
 font = pygame.font.SysFont(None, 24)
 
-# Function to draw a button
+# function to draw button
 def draw_button(text, x, y, width, height, enabled=True, hover=False, border=False):
     if not enabled:
         color = BUTTON_DISABLED_COLOR
@@ -208,7 +206,7 @@ def draw_button(text, x, y, width, height, enabled=True, hover=False, border=Fal
     screen.blit(text_surface, (x + (width - text_surface.get_width()) // 2,
                                y + (height - text_surface.get_height()) // 2))
 
-# Function to draw the scoreboard and timer
+# function to draw scoreboard and timer
 def draw_scoreboard(score, time_remaining, x, y, width, height):
     pygame.draw.rect(screen, SCOREBOARD_COLOR, (x, y, width, height))
     text_surface = font.render(f"Score: {score}", True, SCOREBOARD_TEXT_COLOR)
@@ -217,7 +215,7 @@ def draw_scoreboard(score, time_remaining, x, y, width, height):
     timer_surface = font.render(f"Time: {time_remaining}s", True, SCOREBOARD_TEXT_COLOR)
     screen.blit(timer_surface, (x + width - timer_surface.get_width() - 10, y + (height - timer_surface.get_height()) // 2))
 
-# Button and scoreboard positions
+# button and scoreboard positions
 scoreboard_rect = pygame.Rect(10, GRID_SIZE * CELL_SIZE + 10, WINDOW_WIDTH - 20, SCOREBOARD_HEIGHT)
 disarm_button_rect = pygame.Rect((WINDOW_WIDTH - BUTTON_WIDTH * 2 - 20) // 2, 
                                   WINDOW_HEIGHT - BUTTON_HEIGHT - 10, 
@@ -226,13 +224,13 @@ end_game_button_rect = pygame.Rect((WINDOW_WIDTH + BUTTON_WIDTH) // 2 + 10,
                                     WINDOW_HEIGHT - BUTTON_HEIGHT - 10, 
                                     BUTTON_WIDTH, BUTTON_HEIGHT)
 
-# Game loop
+# main loop
 running = True
 while running:
     mouse_pos = pygame.mouse.get_pos()
     adjacent_to_mine = is_adjacent_to_mine(character_pos, mine_positions)
 
-    # Calculate time remaining if the timer is not stopped
+    # calculate time remaining if the timer is not stopped
     if not timer_stopped:
         time_remaining = 60 - (pygame.time.get_ticks() - start_ticks) // 1000
         if time_remaining <= 0:
@@ -243,7 +241,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            # Play the footsteps sound whenever an arrow key is pressed
+            # play footsteps sound when arrow key is pressed
             if event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]:
                 footsteps_sound.play()
 
@@ -256,17 +254,17 @@ while running:
             elif event.key == pygame.K_DOWN and character_pos[1] < GRID_SIZE - 1:
                 character_pos[1] += 1
 
-            # Check if the character has moved to a mine
+            # check if the character has moved to a mine
             if tuple(character_pos) in mine_positions:
                 explosion_sound.play()  # Play explosion sound
                 explosions.append(tuple(character_pos))  # Add explosion at the character's position
                 
-                # Draw explosion immediately
+                # draw explosion immediately
                 screen.blit(explosion_image, (character_pos[0] * CELL_SIZE, character_pos[1] * CELL_SIZE))
-                pygame.display.flip()  # Update the display to show the explosion
+                pygame.display.flip()
                 
-                # Delay for a brief moment to ensure explosion is visible before popup
-                pygame.time.wait(500)  # Wait for 500 milliseconds (0.5 seconds)
+                # delay for a brief moment to ensure explosion is visible before popup
+                pygame.time.wait(500)
                 
                 show_popup("Game Over!", score, win=False)
 
